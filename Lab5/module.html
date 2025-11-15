@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 5 - Module</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        a {
+            display: inline-block;
+            margin: 10px 10px 10px 0;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lab 5 - Module</h1>
+    
+    <a href="#" id="getModule">Get Module</a>
+    <a href="#" id="getModuleName">Get Module Name</a>
+    
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        
+        document.getElementById('getModule').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_BASE}/lab5/module`);
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = 'Error: ' + error.message;
+            }
+        });
+
+        document.getElementById('getModuleName').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch(`${API_BASE}/lab5/module/name`);
+                const data = await response.json();
+                document.getElementById('result').textContent = data;
+            } catch (error) {
+                document.getElementById('result').textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
+
