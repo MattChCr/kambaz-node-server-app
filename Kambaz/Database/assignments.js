@@ -1,101 +1,36 @@
-export default [
-  {
-    "id": "A101",
-    "title": "Propulsion Assignment",
-    "course": "RS101",
-    "description": "",
-    "availableFrom": "2023-11-02T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-09T23:59",
-    "points": 100
-  },
-  {
-    "id": "A102",
-    "title": "Combustion Analysis",
-    "course": "RS101",
-    "description": "",
-    "availableFrom": "2023-11-12T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-19T23:59",
-    "points": 50
-  },
-  {
-    "id": "A103",
-    "title": "Nozzle Design Project",
-    "course": "RS101",
-    "description": "",
-    "availableFrom": "2023-11-21T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-29T23:59",
-    "points": 150
-  },
-  {
-    "id": "A201",
-    "title": "Aerodynamics Quiz",
-    "course": "RS102",
-    "description": "",
-    "availableFrom": "2023-11-03T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-03T23:59",
-    "points": 120
-  },
-  {
-    "id": "A202",
-    "title": "Flow Analysis",
-    "course": "RS102",
-    "description": "",
-    "availableFrom": "2023-11-06T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-15T23:59",
-    "points": 60
-  },
-  {
-    "id": "A203",
-    "title": "Heating Analysis",
-    "course": "RS102",
-    "description": "",
-    "availableFrom": "2023-11-12T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-15T23:59",
-    "points": 85
-  },
-  {
-    "id": "A301",
-    "title": "Structural Design Task",
-    "course": "RS103",
-    "description": "",
-    "availableFrom": "2023-11-20T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-22T23:59",
-    "points": 25
-  },
-  {
-    "id": "A302",
-    "title": "Orbital Calculations",
-    "course": "RS103",
-    "description": "",
-    "availableFrom": "2023-11-09T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-14T23:59",
-    "points": 100
-  },
-  {
-    "id": "A303",
-    "title": "Systems Engineering Exam",
-    "course": "RS103",
-    "description": "",
-    "availableFrom": "2023-11-10T00:00",
-    "availableUntil": "",
-    "assignTo": "",
-    "dueDate": "2023-11-11T23:59",
-    "points": 300
-  }
-]
+import axios from "axios";
+
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:4000";
+
+const ASSIGNMENTS_API = `${API_BASE}/api/assignments`;
+
+export const createAssignment = async (assignment) => {
+  const response = await axios.post(ASSIGNMENTS_API, assignment);
+  return response.data;
+};
+
+export const findAllAssignments = async (courseId) => {
+  const response = await axios.get(
+    courseId ? `${ASSIGNMENTS_API}?course=${courseId}` : ASSIGNMENTS_API
+  );
+  return response.data;
+};
+
+export const findAssignmentById = async (id) => {
+  const response = await axios.get(`${ASSIGNMENTS_API}/${id}`);
+  return response.data;
+};
+
+export const updateAssignment = async (assignment) => {
+  const response = await axios.put(
+    `${ASSIGNMENTS_API}/${assignment._id}`,
+    assignment
+  );
+  return response.data;
+};
+
+export const deleteAssignment = async (id) => {
+  const response = await axios.delete(`${ASSIGNMENTS_API}/${id}`);
+  return response.data;
+};
+
