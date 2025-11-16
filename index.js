@@ -2,13 +2,17 @@ import express from "express";
 import Lab5 from "./Lab5/index.js";
 import cors from "cors";
 import db from "./Kambaz/Database/index.js";
-import UserRoutes from "./Kambaz/Users/routes.js";
-import CourseRoutes from "./Kambaz/Courses/routes.js";
+import UserRoutes from "./Kambaz/Database/User/routes.js";
+import CourseRoutes from "./Kambaz/Database/Courses/routes.js";
+import AssignmentRoutes from "./Kambaz/Database/Assignments/routes.js";
+import EnrollmentRoutes from "./Kambaz/Database/Enrollments/routes.js";
 import "dotenv/config";
 import session from "express-session";
 const app = express();
 UserRoutes(app, db);
 CourseRoutes(app, db);
+AssignmentRoutes(app);
+EnrollmentRoutes(app);
 app.use(cors({
    credentials: true,
    origin: process.env.CLIENT_URL || "http://localhost:3000",
