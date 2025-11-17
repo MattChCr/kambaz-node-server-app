@@ -20,54 +20,70 @@ export default function EnrollmentRoutes(app) {
   };
 
   const findAllEnrollments = async (req, res) => {
-    const { user, course } = req.query;
-    
-    if (user && course) {
-      const enrollment = await dao.findEnrollmentByUserAndCourse(user, course);
-      if (enrollment) {
-        res.json([enrollment]);
+    try {
+      const { user, course } = req.query;
+      
+      if (user && course) {
+        const enrollment = await dao.findEnrollmentByUserAndCourse(user, course);
+        if (enrollment) {
+          res.json([enrollment]);
+        } else {
+          res.json([]);
+        }
+      } else if (user) {
+        const enrollments = await dao.findEnrollmentsByUser(user);
+        res.json(enrollments);
+      } else if (course) {
+        const enrollments = await dao.findEnrollmentsByCourse(course);
+        res.json(enrollments);
       } else {
-        res.json([]);
+        const enrollments = await dao.findAllEnrollments();
+        res.json(enrollments);
       }
-    } else if (user) {
-      const enrollments = await dao.findEnrollmentsByUser(user);
-      res.json(enrollments);
-    } else if (course) {
-      const enrollments = await dao.findEnrollmentsByCourse(course);
-      res.json(enrollments);
-    } else {
-      const enrollments = await dao.findAllEnrollments();
-      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 
   const findEnrollmentById = async (req, res) => {
-    const { id } = req.params;
-    const enrollment = await dao.findEnrollmentById(id);
-    if (enrollment) {
-      res.json(enrollment);
-    } else {
-      res.status(404).json({ message: `Enrollment with ID ${id} not found` });
+    try {
+      const { id } = req.params;
+      const enrollment = await dao.findEnrollmentById(id);
+      if (enrollment) {
+        res.json(enrollment);
+      } else {
+        res.status(404).json({ message: `Enrollment with ID ${id} not found` });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 
   const deleteEnrollment = async (req, res) => {
-    const { id } = req.params;
-    const success = await dao.deleteEnrollment(id);
-    if (success) {
-      res.sendStatus(200);
-    } else {
-      res.status(404).json({ message: `Enrollment with ID ${id} not found` });
+    try {
+      const { id } = req.params;
+      const success = await dao.deleteEnrollment(id);
+      if (success) {
+        res.sendStatus(200);
+      } else {
+        res.status(404).json({ message: `Enrollment with ID ${id} not found` });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 
   const unenroll = async (req, res) => {
-    const { user, course } = req.body;
-    const success = await dao.deleteEnrollmentByUserAndCourse(user, course);
-    if (success) {
-      res.sendStatus(200);
-    } else {
-      res.status(404).json({ message: "Enrollment not found" });
+    try {
+      const { user, course } = req.body;
+      const success = await dao.deleteEnrollmentByUserAndCourse(user, course);
+      if (success) {
+        res.sendStatus(200);
+      } else {
+        res.status(404).json({ message: "Enrollment not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 

@@ -24,27 +24,42 @@ export default function UserRoutes(app, db) {
 
     res.json(currentUser);
  };
-  const signin = (req, res) => {   const { username, password } = req.body;
-    const currentUser = dao.findUserByCredentials(username, password);
-    if (currentUser) {
-      req.session["currentUser"] = currentUser;
-      res.json(currentUser);
-    } else {
-      res.status(401).json({ message: "Unable to login. Try again later." });
+  const signin = (req, res) => {
+    try {
+      const { username, password } = req.body || {};
+      if (!username || !password) {
+        res.status(400).json({ message: "Username and password are required" });
+        return;
+      }
+      const currentUser = dao.findUserByCredentials(username, password);
+      if (currentUser) {
+        req.session["currentUser"] = currentUser;
+        res.json(currentUser);
+      } else {
+        res.status(401).json({ message: "Unable to login. Try again later." });
+      }
+    } catch (error) {
+      console.error('Signin error:', error);
+      res.status(500).json({ message: error.message || "Internal server error" });
     }
-
- };
+  };
   const signout = (req, res) => { 
     req.session.destroy();
     res.sendStatus(200);
 };
-  const profile = (req, res) => { 
-    const currentUser = req.session["currentUser"];
-    if (!currentUser) {
-      res.sendStatus(401);
-      return;
+  const profile = (req, res) => {
+    try {
+      const currentUser = req.session["currentUser"];
+      if (!currentUser) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+      res.json(currentUser);
+    } catch (error) {
+      console.error('Profile error:', error);
+      res.status(500).json({ message: error.message || "Internal server error" });
     }
-};
+  };
   app.post("/api/users", createUser);
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);

@@ -11,43 +11,59 @@ export default function AssignmentRoutes(app) {
   };
 
   const findAllAssignments = async (req, res) => {
-    const { course } = req.query;
-    if (course) {
-      const assignments = await dao.findAssignmentsByCourse(course);
-      res.json(assignments);
-    } else {
-      const assignments = await dao.findAllAssignments();
-      res.json(assignments);
+    try {
+      const { course } = req.query;
+      if (course) {
+        const assignments = await dao.findAssignmentsByCourse(course);
+        res.json(assignments);
+      } else {
+        const assignments = await dao.findAllAssignments();
+        res.json(assignments);
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 
   const findAssignmentById = async (req, res) => {
-    const { id } = req.params;
-    const assignment = await dao.findAssignmentById(id);
-    if (assignment) {
-      res.json(assignment);
-    } else {
-      res.status(404).json({ message: `Assignment with ID ${id} not found` });
+    try {
+      const { id } = req.params;
+      const assignment = await dao.findAssignmentById(id);
+      if (assignment) {
+        res.json(assignment);
+      } else {
+        res.status(404).json({ message: `Assignment with ID ${id} not found` });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 
   const updateAssignment = async (req, res) => {
-    const { id } = req.params;
-    const assignment = await dao.updateAssignment(id, req.body);
-    if (assignment) {
-      res.json(assignment);
-    } else {
-      res.status(404).json({ message: `Assignment with ID ${id} not found` });
+    try {
+      const { id } = req.params;
+      const assignment = await dao.updateAssignment(id, req.body);
+      if (assignment) {
+        res.json(assignment);
+      } else {
+        res.status(404).json({ message: `Assignment with ID ${id} not found` });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 
   const deleteAssignment = async (req, res) => {
-    const { id } = req.params;
-    const success = await dao.deleteAssignment(id);
-    if (success) {
-      res.sendStatus(200);
-    } else {
-      res.status(404).json({ message: `Assignment with ID ${id} not found` });
+    try {
+      const { id } = req.params;
+      const success = await dao.deleteAssignment(id);
+      if (success) {
+        res.sendStatus(200);
+      } else {
+        res.status(404).json({ message: `Assignment with ID ${id} not found` });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   };
 
