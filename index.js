@@ -15,10 +15,23 @@ const app = express();
 // 1. Trust proxy (REQUIRED for Render)
 app.set("trust proxy", 1);
 
-// 2. CORS with credentials
+// 2. CORS with credentials - allow multiple origins
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://chavaz-next-js-4550-git-a5-mattchcrs-projects.vercel.app",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "https://chavaz-next-js-4550-git-a5-mattchcrs-projects.vercel.app",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin || true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
