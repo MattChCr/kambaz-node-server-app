@@ -11,16 +11,24 @@ export default function CoursesDao(db) {
 }
 
   function createCourse(course) {
-  const newCourse = { ...course, _id: uuidv4() };
-  db.courses = [...db.courses, newCourse];
-  return newCourse;
-}
- function deleteCourse(courseId) {
-    const { courses, enrollments } = db;
-    db.courses = courses.filter((course) => course._id !== courseId);
-    db.enrollments = enrollments.filter(
-      (enrollment) => enrollment.course !== courseId
-  );}
+    const newCourse = { ...course, _id: uuidv4() };
+    db.courses.push(newCourse);
+    return newCourse;
+  }
+  function deleteCourse(courseId) {
+    // Remove course in-place
+    const courseIndex = db.courses.findIndex((course) => course._id === courseId);
+    if (courseIndex !== -1) {
+      db.courses.splice(courseIndex, 1);
+    }
+    // Remove all enrollments for this course in-place
+    for (let i = db.enrollments.length - 1; i >= 0; i--) {
+      if (db.enrollments[i].course === courseId) {
+        db.enrollments.splice(i, 1);
+      }
+    }
+    return { success: true };
+  }
 
 function updateCourse(courseId, courseUpdates) {
   const { courses } = db;

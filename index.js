@@ -12,57 +12,36 @@ import session from "express-session";
 
 const app = express();
 
-// Trust proxy for Render (required for secure cookies behind reverse proxy)
+// 1. Trust proxy (REQUIRED for Render)
 app.set("trust proxy", 1);
 
-// CORS configuration - allow credentials from Vercel domain
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://chavaz-next-js-4550-git-a5-mattchcrs-projects.vercel.app",
-  process.env.CLIENT_URL,
-].filter(Boolean);
-
+// 2. CORS with credentials
 app.use(
   cors({
+    origin: process.env.CLIENT_URL || "https://chavaz-next-js-4550-git-a5-mattchcrs-projects.vercel.app",
     credentials: true,
-    origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, Postman, curl)
-      if (!origin) return callback(null, true);
+  })
+);
 
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("CORS blocked:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
+// 3. Parse JSON bodies
+app.use(express.json());
+
+// 4. Session with cross-origin cookie settings
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "kambaz",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,
+      sameSite: "none",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   })
 );
 
-// Parse JSON bodies BEFORE routes
-app.use(express.json());
-
-// Session configuration
-const isProduction = process.env.NODE_ENV === "production";
-
-const sessionOptions = {
-  secret: process.env.SESSION_SECRET || "kambaz",
-  resave: false,
-  saveUninitialized: false,
-  proxy: isProduction,
-  cookie: {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    // DO NOT set domain for cross-origin cookies
-  },
-};
-
-app.use(session(sessionOptions));
-
-// Routes registered AFTER middleware
+// Routes
 UserRoutes(app, db);
 CourseRoutes(app, db);
 AssignmentRoutes(app);
@@ -70,12 +49,9 @@ EnrollmentRoutes(app);
 ModulesRoutes(app, db);
 Lab5(app);
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error("Error:", err);
-  if (err.message === "Not allowed by CORS") {
-    return res.status(403).json({ message: "Not allowed by CORS" });
-  }
   res.status(500).json({ message: err.message || "Internal server error" });
 });
 
