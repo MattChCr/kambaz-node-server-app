@@ -8,10 +8,10 @@ import enrollments from "./enrollments.js";
 
 // Create mutable copies of all data arrays so they can be modified
 export default {
-  courses: [...courses],
+  courses: courses.map(c => ({ ...c })),
   modules: modules.map(m => ({ ...m, _id: m._id || uuidv4() })),
-  assignments: [...assignments],
-  users: [...users],
-  grades: [...grades],
-  enrollments: [...enrollments],
+  assignments: assignments.map(a => ({ ...a })),
+  users: users.map(u => ({ ...u })),
+  grades: grades.map(g => ({ ...g })),
+  enrollments: enrollments.map(e => ({ ...e })),
 };

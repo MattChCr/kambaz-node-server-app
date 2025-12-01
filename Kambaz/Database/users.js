@@ -1,6 +1,6 @@
 export default [
   {
-    "id": "123",
+    "_id": "123",
     "username": "iron_man",
     "password": "stark123",
     "firstName": "Tony",
@@ -14,7 +14,7 @@ export default [
     "totalActivity": "10:21:32"
   },
   {
-    "id": "345",
+    "_id": "345",
     "username": "dark_knight",
     "password": "wayne123",
     "firstName": "Bruce",
@@ -28,7 +28,7 @@ export default [
     "totalActivity": "15:32:43"
   },
   {
-    "id": "567",
+    "_id": "567",
     "username": "capt_america",
     "password": "rogers123",
     "firstName": "Steve",
@@ -42,7 +42,7 @@ export default [
     "totalActivity": "23:32:43"
   },
   {
-    "id": "789",
+    "_id": "789",
     "username": "black_widow",
     "password": "romanoff123",
     "firstName": "Natasha",
@@ -56,7 +56,7 @@ export default [
     "totalActivity": "13:23:34"
   },
   {
-    "id": "234",
+    "_id": "234",
     "username": "thor_odinson",
     "password": "mjolnir123",
     "firstName": "Thor",
@@ -70,7 +70,7 @@ export default [
     "totalActivity": "11:22:33"
   },
   {
-    "id": "456",
+    "_id": "456",
     "username": "hulk_smash",
     "password": "banner123",
     "firstName": "Bruce",
@@ -84,7 +84,7 @@ export default [
     "totalActivity": "22:33:44"
   },
   {
-    "id": "890",
+    "_id": "890",
     "username": "ring_bearer",
     "password": "shire123",
     "firstName": "Frodo",
@@ -98,7 +98,7 @@ export default [
     "totalActivity": "44:33:22"
   },
   {
-    "id": "899",
+    "_id": "899",
     "username": "strider",
     "password": "aragorn123",
     "firstName": "Aragorn",
@@ -112,7 +112,7 @@ export default [
     "totalActivity": "12:23:34"
   },
   {
-    "id": "125",
+    "_id": "125",
     "username": "elf_archer",
     "password": "legolas123",
     "firstName": "Legolas",
