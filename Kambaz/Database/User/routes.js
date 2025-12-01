@@ -1,12 +1,50 @@
 import UsersDao from "./dao.js";
+import * as enrollmentsDao from "../Enrollments/dao.js";
 
 export default function UserRoutes(app, db) {
- const dao = UsersDao(db);
-  const createUser = (req, res) => { };
-  const deleteUser = (req, res) => { };
-  const findAllUsers = (req, res) => { };
-  const findUserById = (req, res) => { };
-  const updateUser = (req, res) => {  const userId = req.params.userId;
+  const dao = UsersDao(db);
+
+  const createUser = (req, res) => {
+    const user = dao.findUserByUsername(req.body.username);
+    if (user) {
+      res.status(400).json({ message: "Username already in use" });
+      return;
+    }
+    const newUser = dao.createUser(req.body);
+    res.json(newUser);
+  };
+
+  const deleteUser = (req, res) => {
+    const { userId } = req.params;
+    dao.deleteUser(userId);
+    res.sendStatus(200);
+  };
+
+  const findAllUsers = (req, res) => {
+    const users = dao.findAllUsers();
+    res.json(users);
+  };
+
+  const findUserById = (req, res) => {
+    const { userId } = req.params;
+    const user = dao.findUserById(userId);
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: `User with ID ${userId} not found` });
+    }
+  };
+
+  const findUsersForCourse = (req, res) => {
+    const { courseId } = req.params;
+    const enrollments = enrollmentsDao.findEnrollmentsByCourse(courseId);
+    const userIds = enrollments.map((e) => e.user);
+    const users = dao.findAllUsers().filter((u) => userIds.includes(u._id));
+    res.json(users);
+  };
+
+  const updateUser = (req, res) => {
+    const userId = req.params.userId;
     const userUpdates = req.body;
     dao.updateUser(userId, userUpdates);
     const currentUser = dao.findUserById(userId);
@@ -69,4 +107,5 @@ export default function UserRoutes(app, db) {
   app.post("/api/users/signin", signin);
   app.post("/api/users/signout", signout);
   app.post("/api/users/profile", profile);
+  app.get("/api/courses/:courseId/users", findUsersForCourse);
 }
