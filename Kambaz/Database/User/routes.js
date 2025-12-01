@@ -5,10 +5,12 @@ export default function UserRoutes(app, db) {
   const dao = UsersDao(db);
 
   const createUser = (req, res) => {
+    if (!req.body || !req.body.username) {
+      return res.status(400).json({ message: "Username is required" });
+    }
     const user = dao.findUserByUsername(req.body.username);
     if (user) {
-      res.status(400).json({ message: "Username already in use" });
-      return;
+      return res.status(400).json({ message: "Username already in use" });
     }
     const newUser = dao.createUser(req.body);
     res.json(newUser);
@@ -44,24 +46,35 @@ export default function UserRoutes(app, db) {
   };
 
   const updateUser = (req, res) => {
-    const userId = req.params.userId;
+    const { userId } = req.params;
     const userUpdates = req.body;
+    if (!userUpdates || Object.keys(userUpdates).length === 0) {
+      return res.status(400).json({ message: "No updates provided" });
+    }
+    const existingUser = dao.findUserById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ message: `User with ID ${userId} not found` });
+    }
     dao.updateUser(userId, userUpdates);
-    const currentUser = dao.findUserById(userId);
-    req.session["currentUser"] = currentUser;
-    res.json(currentUser);
- };
-  const signup = (req, res) => { const user = dao.findUserByUsername(req.body.username);
+    const updatedUser = dao.findUserById(userId);
+    // Update session if user is updating their own profile
+    if (req.session["currentUser"] && req.session["currentUser"]._id === userId) {
+      req.session["currentUser"] = updatedUser;
+    }
+    res.json(updatedUser);
+  };
+  const signup = (req, res) => {
+    if (!req.body || !req.body.username || !req.body.password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+    const user = dao.findUserByUsername(req.body.username);
     if (user) {
-      res.status(400).json(
-        { message: "Username already in use" });
-      return;
+      return res.status(400).json({ message: "Username already in use" });
     }
     const currentUser = dao.createUser(req.body);
     req.session["currentUser"] = currentUser;
-
     res.json(currentUser);
- };
+  };
   const signin = (req, res) => {
     try {
       const { username, password } = req.body || {};

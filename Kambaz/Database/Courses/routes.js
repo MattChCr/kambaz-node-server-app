@@ -5,8 +5,12 @@ import * as assignmentsDao from "../Assignments/dao.js";
 export default function CourseRoutes(app, db) {
   const dao = CoursesDao(db);
   const enrollmentsDao = EnrollmentsDao(db);
+
   const createCourse = (req, res) => {
     const currentUser = req.session["currentUser"];
+    if (!currentUser) {
+      return res.status(401).json({ message: "Unauthorized - Please sign in" });
+    }
     const newCourse = dao.createCourse(req.body);
     enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
     res.json(newCourse);
