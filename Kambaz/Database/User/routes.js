@@ -51,44 +51,33 @@ export default function UserRoutes(app, db) {
     req.session["currentUser"] = currentUser;
     res.json(currentUser);
  };
-  const signup = (req, res) => {
-    const user = dao.findUserByUsername(req.body.username);
+  const signup = (req, res) => { const user = dao.findUserByUsername(req.body.username);
     if (user) {
-      return res.status(400).json({ message: "Username already in use" });
+      res.status(400).json(
+        { message: "Username already in use" });
+      return;
     }
     const currentUser = dao.createUser(req.body);
     req.session["currentUser"] = currentUser;
-    // Explicitly save session before responding
-    req.session.save((err) => {
-      if (err) {
-        console.error("Session save error:", err);
-        return res.status(500).json({ message: "Session error" });
-      }
-      res.json(currentUser);
-    });
-  };
+
+    res.json(currentUser);
+ };
   const signin = (req, res) => {
     try {
       const { username, password } = req.body || {};
       if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
+        res.status(400).json({ message: "Username and password are required" });
+        return;
       }
       const currentUser = dao.findUserByCredentials(username, password);
       if (currentUser) {
         req.session["currentUser"] = currentUser;
-        // Explicitly save session before responding
-        req.session.save((err) => {
-          if (err) {
-            console.error("Session save error:", err);
-            return res.status(500).json({ message: "Session error" });
-          }
-          res.json(currentUser);
-        });
+        res.json(currentUser);
       } else {
         res.status(401).json({ message: "Unable to login. Try again later." });
       }
     } catch (error) {
-      console.error("Signin error:", error);
+      console.error('Signin error:', error);
       res.status(500).json({ message: error.message || "Internal server error" });
     }
   };

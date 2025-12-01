@@ -1,6 +1,6 @@
 export default [
   {
-    "_id": "A101",
+    "id": "A101",
     "title": "Propulsion Assignment",
     "course": "RS101",
     "description": "",
@@ -11,7 +11,7 @@ export default [
     "points": 100
   },
   {
-    "_id": "A102",
+    "id": "A102",
     "title": "Combustion Analysis",
     "course": "RS101",
     "description": "",
@@ -22,7 +22,7 @@ export default [
     "points": 50
   },
   {
-    "_id": "A103",
+    "id": "A103",
     "title": "Nozzle Design Project",
     "course": "RS101",
     "description": "",
@@ -33,7 +33,7 @@ export default [
     "points": 150
   },
   {
-    "_id": "A201",
+    "id": "A201",
     "title": "Aerodynamics Quiz",
     "course": "RS102",
     "description": "",
@@ -44,7 +44,7 @@ export default [
     "points": 120
   },
   {
-    "_id": "A202",
+    "id": "A202",
     "title": "Flow Analysis",
     "course": "RS102",
     "description": "",
@@ -55,7 +55,7 @@ export default [
     "points": 60
   },
   {
-    "_id": "A203",
+    "id": "A203",
     "title": "Heating Analysis",
     "course": "RS102",
     "description": "",
@@ -66,7 +66,7 @@ export default [
     "points": 85
   },
   {
-    "_id": "A301",
+    "id": "A301",
     "title": "Structural Design Task",
     "course": "RS103",
     "description": "",
@@ -77,7 +77,7 @@ export default [
     "points": 25
   },
   {
-    "_id": "A302",
+    "id": "A302",
     "title": "Orbital Calculations",
     "course": "RS103",
     "description": "",
@@ -88,7 +88,7 @@ export default [
     "points": 100
   },
   {
-    "_id": "A303",
+    "id": "A303",
     "title": "Systems Engineering Exam",
     "course": "RS103",
     "description": "",

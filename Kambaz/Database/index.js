@@ -6,12 +6,12 @@ import users from "./users.js";
 import grades from "./grades.js";
 import enrollments from "./enrollments.js";
 
-// Create mutable copies of all data arrays so they can be modified
-export default {
-  courses: courses.map(c => ({ ...c })),
-  modules: modules.map(m => ({ ...m, _id: m._id || uuidv4() })),
-  assignments: assignments.map(a => ({ ...a })),
-  users: users.map(u => ({ ...u })),
-  grades: grades.map(g => ({ ...g })),
-  enrollments: enrollments.map(e => ({ ...e })),
-};
+// Ensure all modules have _id fields (add _id to modules that don't have one)
+const modulesWithIds = modules.map(module => {
+  if (!module._id) {
+    return { ...module, _id: uuidv4() };
+  }
+  return module;
+});
+
+export default { courses, modules: modulesWithIds, assignments, users, grades, enrollments };

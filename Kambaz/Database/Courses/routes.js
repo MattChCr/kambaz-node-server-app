@@ -7,10 +7,6 @@ export default function CourseRoutes(app, db) {
   const enrollmentsDao = EnrollmentsDao(db);
   const createCourse = (req, res) => {
     const currentUser = req.session["currentUser"];
-    if (!currentUser) {
-      res.sendStatus(401);
-      return;
-    }
     const newCourse = dao.createCourse(req.body);
     enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
     res.json(newCourse);
@@ -39,11 +35,11 @@ export default function CourseRoutes(app, db) {
     const status = dao.deleteCourse(courseId);
     res.send(status);
   }
-  const updateCourse = (req, res) => {
+   const updateCourse = (req, res) => {
     const { courseId } = req.params;
     const courseUpdates = req.body;
-    const updatedCourse = dao.updateCourse(courseId, courseUpdates);
-    res.json(updatedCourse);
+    const status = dao.updateCourse(courseId, courseUpdates);
+    res.send(status);
   }
   const findAssignmentsForCourse = (req, res) => {
     const { courseId } = req.params;
