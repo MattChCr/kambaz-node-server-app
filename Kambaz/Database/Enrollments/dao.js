@@ -1,53 +1,52 @@
 import { v4 as uuidv4 } from "uuid";
-
-let enrollments = [];
+import db from "../index.js";
 
 export const createEnrollment = (enrollment) => {
   const newEnrollment = {
     ...enrollment,
     _id: uuidv4(),
   };
-  enrollments.push(newEnrollment);
+  db.enrollments.push(newEnrollment);
   return newEnrollment;
 };
 
-export const findAllEnrollments = () => enrollments;
+export const findAllEnrollments = () => db.enrollments;
 
 export const findEnrollmentById = (id) => {
-  return enrollments.find((enrollment) => enrollment._id === id);
+  return db.enrollments.find((enrollment) => enrollment._id === id);
 };
 
 export const findEnrollmentsByUser = (userId) => {
-  return enrollments.filter((enrollment) => enrollment.user === userId);
+  return db.enrollments.filter((enrollment) => enrollment.user === userId);
 };
 
 export const findEnrollmentsByCourse = (courseId) => {
-  return enrollments.filter((enrollment) => enrollment.course === courseId);
+  return db.enrollments.filter((enrollment) => enrollment.course === courseId);
 };
 
 export const findEnrollmentByUserAndCourse = (userId, courseId) => {
-  return enrollments.find(
+  return db.enrollments.find(
     (enrollment) => enrollment.user === userId && enrollment.course === courseId
   );
 };
 
 export const deleteEnrollment = (id) => {
-  const index = enrollments.findIndex((e) => e._id === id);
+  const index = db.enrollments.findIndex((e) => e._id === id);
   if (index === -1) {
     return false;
   }
-  enrollments.splice(index, 1);
+  db.enrollments.splice(index, 1);
   return true;
 };
 
 export const deleteEnrollmentByUserAndCourse = (userId, courseId) => {
-  const index = enrollments.findIndex(
+  const index = db.enrollments.findIndex(
     (e) => e.user === userId && e.course === courseId
   );
   if (index === -1) {
     return false;
   }
-  enrollments.splice(index, 1);
+  db.enrollments.splice(index, 1);
   return true;
 };
 
@@ -59,7 +58,7 @@ export default function EnrollmentsDao(db) {
       user: userId,
       course: courseId
     };
-    enrollments.push(newEnrollment);
+    db.enrollments.push(newEnrollment);
     return newEnrollment;
   }
   return { enrollUserInCourse };
