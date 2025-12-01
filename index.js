@@ -12,10 +12,10 @@ import session from "express-session";
 
 const app = express();
 
-// 1. Trust proxy (REQUIRED for Render)
+// 1. Trust proxy FIRST (REQUIRED for Render/Heroku)
 app.set("trust proxy", 1);
 
-// 2. CORS with credentials - allow multiple origins
+// 2. CORS - must be before session
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
@@ -25,10 +25,14 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, origin || true);
+    origin: (origin, callback) => {
+      // Allow requests with no origin (Postman, curl, mobile apps)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, origin); // Return the actual origin, not true
       } else {
+        console.log("CORS blocked:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -36,25 +40,26 @@ app.use(
   })
 );
 
-// 3. Parse JSON bodies
+// 3. Parse JSON
 app.use(express.json());
 
-// 4. Session with cross-origin cookie settings
+// 4. Session - AFTER cors, BEFORE routes
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "kambaz",
     resave: false,
     saveUninitialized: false,
+    proxy: true, // Required for Render
     cookie: {
-      secure: true,
-      sameSite: "none",
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: true,       // HTTPS only
+      sameSite: "none",   // Cross-origin
+      httpOnly: true,     // No JS access
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
 
-// Routes
+// 5. Routes
 UserRoutes(app, db);
 CourseRoutes(app, db);
 AssignmentRoutes(app);
@@ -62,7 +67,7 @@ EnrollmentRoutes(app);
 ModulesRoutes(app, db);
 Lab5(app);
 
-// Error handling
+// 6. Error handling
 app.use((err, req, res, next) => {
   console.error("Error:", err);
   res.status(500).json({ message: err.message || "Internal server error" });
@@ -71,4 +76,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log("Allowed origins:", allowedOrigins);
 });
