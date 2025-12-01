@@ -3,22 +3,19 @@ import * as dao from "./dao.js";
 export default function EnrollmentRoutes(app) {
   const createEnrollment = async (req, res) => {
     try {
-      const { user, course } = req.body || {};
-      
-      if (!user || !course) {
-        return res.status(400).json({ message: "User and course are required" });
-      }
+      const { user, course } = req.body;
       
       // Check if enrollment already exists
       const existing = await dao.findEnrollmentByUserAndCourse(user, course);
       if (existing) {
-        return res.status(400).json({ message: "User is already enrolled in this course" });
+        res.status(400).json({ message: "User is already enrolled in this course" });
+        return;
       }
 
       const enrollment = await dao.createEnrollment(req.body);
       res.json(enrollment);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   };
 
@@ -78,12 +75,7 @@ export default function EnrollmentRoutes(app) {
 
   const unenroll = async (req, res) => {
     try {
-      const { user, course } = req.body || {};
-      
-      if (!user || !course) {
-        return res.status(400).json({ message: "User and course are required" });
-      }
-      
+      const { user, course } = req.body;
       const success = await dao.deleteEnrollmentByUserAndCourse(user, course);
       if (success) {
         res.sendStatus(200);
@@ -149,4 +141,3 @@ export default function EnrollmentRoutes(app) {
   app.post("/api/users/current/courses/:courseId", enrollCurrentUser);
   app.delete("/api/users/current/courses/:courseId", unenrollCurrentUser);
 }
-

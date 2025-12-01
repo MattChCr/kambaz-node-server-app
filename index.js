@@ -9,60 +9,50 @@ import EnrollmentRoutes from "./Kambaz/Database/Enrollments/routes.js";
 import ModulesRoutes from "./Kambaz/Database/Modules/routes.js";
 import "dotenv/config";
 import session from "express-session";
-
 const app = express();
 
-// Trust proxy for Render/Vercel (required for secure cookies behind reverse proxy)
-app.set("trust proxy", 1);
+app.use(cors({
+   credentials: true,
+   origin: function (origin, callback) {
+     const allowedOrigins = [
+       'http://localhost:3000',
+       'http://localhost:5173',
+       'https://chavaz-next-js-4550-git-a5-mattchcrs-projects.vercel.app',
+       process.env.CLIENT_URL
+     ].filter(Boolean);
+     
+     // Allow requests with no origin (like mobile apps, Postman, etc.)
+     if (!origin) return callback(null, true);
+     
+     if (allowedOrigins.indexOf(origin) !== -1) {
+       callback(null, true);
+     } else {
+       callback(new Error('Not allowed by CORS'));
+     }
+   }
+ }));
 
-// ===================
-// CORS CONFIGURATION
-// ===================
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  process.env.CLIENT_URL,
-].filter(Boolean);
-
-app.use(
-  cors({
-    credentials: true,
-    origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, Postman, curl)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("CORS blocked origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-  })
-);
-
-// Parse JSON bodies BEFORE routes
+// express.json() MUST be before routes to parse request bodies
 app.use(express.json());
 
-// ===================
-// SESSION CONFIGURATION
-// ===================
-const isProduction = process.env.NODE_ENV === "production";
-
+// Session middleware MUST be before routes to make req.session available
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
-  proxy: isProduction,
   cookie: {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    secure: process.env.SERVER_ENV !== "development", // true in production (HTTPS), false in dev (HTTP)
+    sameSite: process.env.SERVER_ENV !== "development" ? "none" : "lax", // "none" for cross-origin, "lax" for same-origin
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    // DO NOT set domain for cross-origin cookies
   },
 };
-
+if (process.env.SERVER_ENV !== "development") {
+  sessionOptions.proxy = true;
+  if (process.env.SERVER_URL) {
+    sessionOptions.cookie.domain = process.env.SERVER_URL;
+  }
+}
 app.use(session(sessionOptions));
 
 // Routes registered AFTER middleware
