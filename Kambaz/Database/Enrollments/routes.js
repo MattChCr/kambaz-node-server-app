@@ -87,10 +87,58 @@ export default function EnrollmentRoutes(app) {
     }
   };
 
+  const enrollCurrentUser = async (req, res) => {
+    try {
+      const currentUser = req.session["currentUser"];
+      if (!currentUser) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+      const { courseId } = req.params;
+      
+      // Check if enrollment already exists
+      const existing = await dao.findEnrollmentByUserAndCourse(currentUser._id, courseId);
+      if (existing) {
+        res.status(400).json({ message: "Already enrolled in this course" });
+        return;
+      }
+
+      const enrollment = await dao.createEnrollment({
+        user: currentUser._id,
+        course: courseId,
+      });
+      res.json(enrollment);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  const unenrollCurrentUser = async (req, res) => {
+    try {
+      const currentUser = req.session["currentUser"];
+      if (!currentUser) {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+      const { courseId } = req.params;
+      
+      const success = await dao.deleteEnrollmentByUserAndCourse(currentUser._id, courseId);
+      if (success) {
+        res.sendStatus(200);
+      } else {
+        res.status(404).json({ message: "Enrollment not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
   app.post("/api/enrollments", createEnrollment);
   app.get("/api/enrollments", findAllEnrollments);
   app.get("/api/enrollments/:id", findEnrollmentById);
   app.delete("/api/enrollments/:id", deleteEnrollment);
   app.post("/api/enrollments/unenroll", unenroll);
+  app.post("/api/users/current/courses/:courseId", enrollCurrentUser);
+  app.delete("/api/users/current/courses/:courseId", unenrollCurrentUser);
 }
 
