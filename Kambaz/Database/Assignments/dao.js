@@ -1,41 +1,39 @@
 import { v4 as uuidv4 } from "uuid";
-
-let assignments = [];
+import db from "../index.js";
 
 export const createAssignment = (assignment) => {
   const newAssignment = {
     ...assignment,
     _id: uuidv4(),
   };
-  assignments.push(newAssignment);
+  db.assignments.push(newAssignment);
   return newAssignment;
 };
 
-export const findAllAssignments = () => assignments;
+export const findAllAssignments = () => db.assignments;
 
 export const findAssignmentById = (id) => {
-  return assignments.find((assignment) => assignment._id === id);
+  return db.assignments.find((assignment) => assignment._id === id);
 };
 
 export const findAssignmentsByCourse = (courseId) => {
-  return assignments.filter((assignment) => assignment.course === courseId);
+  return db.assignments.filter((assignment) => assignment.course === courseId);
 };
 
-export const updateAssignment = (id, assignment) => {
-  const index = assignments.findIndex((a) => a._id === id);
+export const updateAssignment = (id, assignmentUpdates) => {
+  const index = db.assignments.findIndex((a) => a._id === id);
   if (index === -1) {
     return null;
   }
-  assignments[index] = { ...assignments[index], ...assignment, _id: id };
-  return assignments[index];
+  db.assignments[index] = { ...db.assignments[index], ...assignmentUpdates, _id: id };
+  return db.assignments[index];
 };
 
 export const deleteAssignment = (id) => {
-  const index = assignments.findIndex((a) => a._id === id);
+  const index = db.assignments.findIndex((a) => a._id === id);
   if (index === -1) {
     return false;
   }
-  assignments.splice(index, 1);
+  db.assignments.splice(index, 1);
   return true;
 };
-

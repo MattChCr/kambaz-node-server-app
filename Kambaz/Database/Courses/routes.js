@@ -39,11 +39,11 @@ export default function CourseRoutes(app, db) {
     const status = dao.deleteCourse(courseId);
     res.send(status);
   }
-   const updateCourse = (req, res) => {
+  const updateCourse = (req, res) => {
     const { courseId } = req.params;
     const courseUpdates = req.body;
-    const status = dao.updateCourse(courseId, courseUpdates);
-    res.send(status);
+    const updatedCourse = dao.updateCourse(courseId, courseUpdates);
+    res.json(updatedCourse);
   }
   const findAssignmentsForCourse = (req, res) => {
     const { courseId } = req.params;
