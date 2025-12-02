@@ -29,6 +29,8 @@ const updateModule = async (req, res) => {
 
   app.put("/api/modules/:moduleId", updateModule);
   app.delete("/api/modules/:moduleId", deleteModule);
+  app.put("/api/courses/:courseId/modules/:moduleId", updateModule);
+  app.delete("/api/courses/:courseId/modules/:moduleId", deleteModule);
   app.post("/api/courses/:courseId/modules", createModuleForCourse);
   app.get("/api/courses/:courseId/modules", findModulesForCourse);
 }

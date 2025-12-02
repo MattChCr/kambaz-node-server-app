@@ -41,12 +41,13 @@ export default function AssignmentRoutes(app) {
 
   const updateAssignment = async (req, res) => {
     try {
-      const { id } = req.params;
-      const assignment = await dao.updateAssignment(id, req.body);
+      const { id, assignmentId } = req.params;
+      const targetId = assignmentId || id;
+      const assignment = await dao.updateAssignment(targetId, req.body);
       if (assignment) {
         res.json(assignment);
       } else {
-        res.status(404).json({ message: `Assignment with ID ${id} not found` });
+        res.status(404).json({ message: `Assignment with ID ${targetId} not found` });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -55,12 +56,13 @@ export default function AssignmentRoutes(app) {
 
   const deleteAssignment = async (req, res) => {
     try {
-      const { id } = req.params;
-      const success = await dao.deleteAssignment(id);
+      const { id, assignmentId } = req.params;
+      const targetId = assignmentId || id;
+      const success = await dao.deleteAssignment(targetId);
       if (success) {
         res.sendStatus(200);
       } else {
-        res.status(404).json({ message: `Assignment with ID ${id} not found` });
+        res.status(404).json({ message: `Assignment with ID ${targetId} not found` });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -72,5 +74,7 @@ export default function AssignmentRoutes(app) {
   app.get("/api/assignments/:id", findAssignmentById);
   app.put("/api/assignments/:id", updateAssignment);
   app.delete("/api/assignments/:id", deleteAssignment);
+  app.put("/api/courses/:courseId/assignments/:assignmentId", updateAssignment);
+  app.delete("/api/courses/:courseId/assignments/:assignmentId", deleteAssignment);
 }
 
