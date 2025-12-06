@@ -1,4 +1,6 @@
 import express from "express";
+import mongoose from "mongoose";
+
 import Lab5 from "./Lab5/index.js";
 import cors from "cors";
 import db from "./Kambaz/Database/index.js";
@@ -10,12 +12,13 @@ import ModulesRoutes from "./Kambaz/Database/Modules/routes.js";
 import "dotenv/config";
 import session from "express-session";
 
+const CONNECTION_STRING = process.env.DATABASE_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz"
+mongoose.connect(CONNECTION_STRING);
+
 const app = express();
 
-// REQUIRED for Render - trust the proxy
 app.set("trust proxy", 1);
 
-// CORS - must allow credentials and your Vercel origin
 app.use(cors({
   credentials: true,
   origin: function (origin, callback) {
@@ -36,10 +39,8 @@ app.use(cors({
   }
 }));
 
-// Parse JSON
 app.use(express.json());
 
-// Session - configured for cross-origin (Vercel <-> Render)
 app.use(session({
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
@@ -53,7 +54,6 @@ app.use(session({
   },
 }));
 
-// Routes
 UserRoutes(app, db);
 CourseRoutes(app, db);
 AssignmentRoutes(app);
@@ -61,7 +61,6 @@ EnrollmentRoutes(app);
 ModulesRoutes(app, db);                   
 Lab5(app);
 
-// Error handling
 app.use((err, req, res, next) => {
   console.error("Error:", err);
   if (err.message === "Not allowed by CORS") {
