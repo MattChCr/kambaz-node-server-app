@@ -5,7 +5,10 @@ export default function ModulesDao(db) {
 
  async function findModulesForCourse(courseId) {
     const course = await model.findById(courseId);
-   return course.modules;
+    if (!course) {
+      return [];
+    }
+    return course.modules || [];
  }
  
  async function deleteModule(courseId, moduleId) {
@@ -28,7 +31,13 @@ export default function ModulesDao(db) {
 
  async function updateModule(courseId, moduleId, moduleUpdates) {
    const course = await model.findById(courseId);
-   const module = course.modules.id(moduleId);
+   if (!course) {
+     return null;
+   }
+   const module = course.modules?.id(moduleId);
+   if (!module) {
+     return null;
+   }
    Object.assign(module, moduleUpdates);
    await course.save();
    return module;
