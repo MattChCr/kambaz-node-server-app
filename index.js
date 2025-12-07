@@ -26,6 +26,7 @@ app.use(cors({
       "http://localhost:3000",
       "http://localhost:5173",
       "https://chavaz-next-js-4550-git-a5-mattchcrs-projects.vercel.app",
+      "https://chavaz-next-js-4550-git-a6-mattchcrs-projects.vercel.app",
       process.env.CLIENT_URL
     ].filter(Boolean);
     
