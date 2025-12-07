@@ -1,15 +1,14 @@
 import CoursesDao from "./dao.js";
-import EnrollmentsDao from "../Enrollments/dao.js";
+import * as enrollmentsDao from "../Enrollments/dao.js";
 import * as assignmentsDao from "../Assignments/dao.js";
 
 export default function CourseRoutes(app) {
   const dao = CoursesDao();
-  const enrollmentsDao = EnrollmentsDao(db);
 
   const createCourse = async (req, res) => {
     const currentUser = req.session["currentUser"];
     const newCourse = await dao.createCourse(req.body);
-    enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
+    await enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
     res.json(newCourse);
   };
   app.post("/api/users/current/courses", createCourse);
@@ -43,19 +42,19 @@ export default function CourseRoutes(app) {
     const status = await dao.updateCourse(courseId, courseUpdates);
     res.send(status);
   }
-  const findAssignmentsForCourse = (req, res) => {
+  const findAssignmentsForCourse = async (req, res) => {
     const { courseId } = req.params;
-    const assignments = assignmentsDao.findAssignmentsByCourse(courseId);
+    const assignments = await assignmentsDao.findAssignmentsByCourse(courseId);
     res.json(assignments);
   };
 
-  const createAssignmentForCourse = (req, res) => {
+  const createAssignmentForCourse = async (req, res) => {
     const { courseId } = req.params;
     const assignment = {
       ...req.body,
       course: courseId,
     };
-    const newAssignment = assignmentsDao.createAssignment(assignment);
+    const newAssignment = await assignmentsDao.createAssignment(assignment);
     res.json(newAssignment);
   };
 
