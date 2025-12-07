@@ -1,41 +1,31 @@
+import model from "./model.js";
 import { v4 as uuidv4 } from "uuid";
 
-let assignments = [];
-
-export const createAssignment = (assignment) => {
+export const createAssignment = async (assignment) => {
   const newAssignment = {
     ...assignment,
-    _id: uuidv4(),
+    _id: assignment._id || uuidv4(),
   };
-  assignments.push(newAssignment);
-  return newAssignment;
+  return await model.create(newAssignment);
 };
 
-export const findAllAssignments = () => assignments;
-
-export const findAssignmentById = (id) => {
-  return assignments.find((assignment) => assignment._id === id);
+export const findAllAssignments = async () => {
+  return await model.find();
 };
 
-export const findAssignmentsByCourse = (courseId) => {
-  return assignments.filter((assignment) => assignment.course === courseId);
+export const findAssignmentById = async (id) => {
+  return await model.findById(id);
 };
 
-export const updateAssignment = (id, assignment) => {
-  const index = assignments.findIndex((a) => a._id === id);
-  if (index === -1) {
-    return null;
-  }
-  assignments[index] = { ...assignments[index], ...assignment, _id: id };
-  return assignments[index];
+export const findAssignmentsByCourse = async (courseId) => {
+  return await model.find({ course: courseId });
 };
 
-export const deleteAssignment = (id) => {
-  const index = assignments.findIndex((a) => a._id === id);
-  if (index === -1) {
-    return false;
-  }
-  assignments.splice(index, 1);
-  return true;
+export const updateAssignment = async (id, assignment) => {
+  return await model.findByIdAndUpdate(id, assignment, { new: true });
 };
 
+export const deleteAssignment = async (id) => {
+  const result = await model.deleteOne({ _id: id });
+  return result.deletedCount > 0;
+};
