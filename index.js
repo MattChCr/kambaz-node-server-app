@@ -23,21 +23,25 @@ app.set("trust proxy", 1);
 app.use(cors({
   credentials: true,
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "https://chavaz-next-js-4550-git-a5-mattchcrs-projects.vercel.app",
-      "https://chavaz-next-js-4550-git-a6-mattchcrs-projects.vercel.app",
-      process.env.CLIENT_URL
-    ].filter(Boolean);
-    
+    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.includes(origin)) {
-      callback(null, origin);
-    } else {
-      callback(new Error("Not allowed by CORS"));
+    // Allow localhost for development
+    if (origin.includes("localhost")) {
+      return callback(null, origin);
     }
+    
+    // Allow all Vercel deployments for chavaz-next-js-4550
+    if (origin.includes("chavaz-next-js-4550") && origin.includes("vercel.app")) {
+      return callback(null, origin);
+    }
+    
+    // Allow CLIENT_URL from environment
+    if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
+      return callback(null, origin);
+    }
+    
+    callback(new Error("Not allowed by CORS"));
   }
 }));
 
