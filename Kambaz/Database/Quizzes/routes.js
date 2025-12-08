@@ -1,107 +1,94 @@
 import * as dao from "./dao.js";
 
-export default function QuizAttemptRoutes(app) {
-  
-  // GET /api/courses/:cid/quizzes/:qid/attempts/me
-  // Get the current user's last attempt for a quiz
-  const getMyAttempt = async (req, res) => {
+export default function QuizRoutes(app) {
+
+  const findQuizzesForCourse = async (req, res) => {
     try {
-      const currentUser = req.session["currentUser"];
-      if (!currentUser) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
-      const { qid } = req.params;
-      const attempt = await dao.getLastAttemptForUser(qid, currentUser._id);
-      
-      if (!attempt) {
-        return res.status(404).json({ message: "No attempts found" });
-      }
-      
-      res.json(attempt);
+      const { cid } = req.params;
+      const quizzes = await dao.findQuizzesForCourse(cid);
+      res.json(quizzes);
     } catch (error) {
-      console.error("Error getting attempt:", error);
+      console.error("Error finding quizzes:", error);
       res.status(500).json({ message: error.message });
     }
   };
 
-  // GET /api/courses/:cid/quizzes/:qid/attempts/me/all
-  // Get all of the current user's attempts for a quiz
-  const getMyAllAttempts = async (req, res) => {
+  const findQuizById = async (req, res) => {
     try {
-      const currentUser = req.session["currentUser"];
-      if (!currentUser) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
       const { qid } = req.params;
-      const attempts = await dao.getAttemptsForUser(qid, currentUser._id);
-      
-      res.json(attempts);
+      const quiz = await dao.findQuizById(qid);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+      res.json(quiz);
     } catch (error) {
-      console.error("Error getting attempts:", error);
+      console.error("Error finding quiz:", error);
       res.status(500).json({ message: error.message });
     }
   };
 
-  // POST /api/courses/:cid/quizzes/:qid/attempts
-  // Submit a new quiz attempt
-  const submitAttempt = async (req, res) => {
+  const createQuiz = async (req, res) => {
     try {
-      const currentUser = req.session["currentUser"];
-      if (!currentUser) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
-      const { qid } = req.params;
-      
-      // Get current attempt count to determine attempt number
-      const attemptCount = await dao.getAttemptCount(qid, currentUser._id);
-      
-      const attemptData = {
+      const { cid } = req.params;
+      const quizData = {
         ...req.body,
-        quiz: qid,
-        user: currentUser._id,
-        attemptNumber: attemptCount + 1,
-        submittedAt: new Date()
+        course: cid,
       };
-      
-      const attempt = await dao.createAttempt(attemptData);
-      res.json(attempt);
+      const quiz = await dao.createQuiz(quizData);
+      res.json(quiz);
     } catch (error) {
-      console.error("Error submitting attempt:", error);
+      console.error("Error creating quiz:", error);
       res.status(500).json({ message: error.message });
     }
   };
 
-  // GET /api/courses/:cid/quizzes/:qid/attempts
-  // Get all attempts for a quiz (for faculty)
-  const getAllAttempts = async (req, res) => {
+  const updateQuiz = async (req, res) => {
     try {
-      const currentUser = req.session["currentUser"];
-      if (!currentUser) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      
-      // Optional: Check if user is faculty
-      // if (currentUser.role !== "FACULTY" && currentUser.role !== "ADMIN") {
-      //   return res.status(403).json({ message: "Forbidden" });
-      // }
-      
       const { qid } = req.params;
-      const attempts = await dao.getAllAttemptsForQuiz(qid);
-      
-      res.json(attempts);
+      const quiz = await dao.updateQuiz(qid, req.body);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+      res.json(quiz);
     } catch (error) {
-      console.error("Error getting all attempts:", error);
+      console.error("Error updating quiz:", error);
       res.status(500).json({ message: error.message });
     }
   };
 
-  // Register routes - ORDER MATTERS: more specific routes first
-  app.get("/api/courses/:cid/quizzes/:qid/attempts/me/all", getMyAllAttempts);
-  app.get("/api/courses/:cid/quizzes/:qid/attempts/me", getMyAttempt);
-  app.get("/api/courses/:cid/quizzes/:qid/attempts", getAllAttempts);
-  app.post("/api/courses/:cid/quizzes/:qid/attempts", submitAttempt);
-}
+  const deleteQuiz = async (req, res) => {
+    try {
+      const { qid } = req.params;
+      const quiz = await dao.deleteQuiz(qid);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+      res.sendStatus(200);
+    } catch (error) {
+      console.error("Error deleting quiz:", error);
+      res.status(500).json({ message: error.message });
+    }
+  };
 
+  const publishQuiz = async (req, res) => {
+    try {
+      const { qid } = req.params;
+      const { published } = req.body;
+      const quiz = await dao.publishQuiz(qid, published);
+      if (!quiz) {
+        return res.status(404).json({ message: "Quiz not found" });
+      }
+      res.json(quiz);
+    } catch (error) {
+      console.error("Error publishing quiz:", error);
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  app.get("/api/courses/:cid/quizzes", findQuizzesForCourse);
+  app.post("/api/courses/:cid/quizzes", createQuiz);
+  app.get("/api/courses/:cid/quizzes/:qid", findQuizById);
+  app.put("/api/courses/:cid/quizzes/:qid", updateQuiz);
+  app.delete("/api/courses/:cid/quizzes/:qid", deleteQuiz);
+  app.put("/api/courses/:cid/quizzes/:qid/publish", publishQuiz);
+}

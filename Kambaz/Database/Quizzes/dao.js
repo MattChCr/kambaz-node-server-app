@@ -1,40 +1,30 @@
 import { v4 as uuidv4 } from "uuid";
 import model from "./model.js";
 
-// Get the last attempt for a user on a quiz
-export async function getLastAttemptForUser(quizId, userId) {
-  return model.findOne({ quiz: quizId, user: userId })
-    .sort({ attemptNumber: -1 });
+export async function findQuizzesForCourse(courseId) {
+  return model.find({ course: courseId });
 }
 
-// Get all attempts for a user on a quiz
-export async function getAttemptsForUser(quizId, userId) {
-  return model.find({ quiz: quizId, user: userId })
-    .sort({ attemptNumber: -1 });
+export async function findQuizById(quizId) {
+  return model.findById(quizId);
 }
 
-// Get all attempts for a quiz (for faculty)
-export async function getAllAttemptsForQuiz(quizId) {
-  return model.find({ quiz: quizId })
-    .sort({ user: 1, attemptNumber: -1 });
-}
-
-// Create a new attempt
-export async function createAttempt(attemptData) {
-  const newAttempt = {
-    ...attemptData,
-    _id: attemptData._id || uuidv4(),
+export async function createQuiz(quizData) {
+  const newQuiz = {
+    ...quizData,
+    _id: quizData._id || uuidv4(),
   };
-  return model.create(newAttempt);
+  return model.create(newQuiz);
 }
 
-// Get attempt count for a user on a quiz
-export async function getAttemptCount(quizId, userId) {
-  return model.countDocuments({ quiz: quizId, user: userId });
+export async function updateQuiz(quizId, quizUpdates) {
+  return model.findByIdAndUpdate(quizId, quizUpdates, { new: true });
 }
 
-// Get attempt by ID
-export async function getAttemptById(attemptId) {
-  return model.findById(attemptId);
+export async function deleteQuiz(quizId) {
+  return model.findByIdAndDelete(quizId);
 }
 
+export async function publishQuiz(quizId, published) {
+  return model.findByIdAndUpdate(quizId, { published }, { new: true });
+}

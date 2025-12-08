@@ -9,7 +9,8 @@ import CourseRoutes from "./Kambaz/Database/Courses/routes.js";
 import AssignmentRoutes from "./Kambaz/Database/Assignments/routes.js";
 import EnrollmentRoutes from "./Kambaz/Database/Enrollments/routes.js";
 import ModulesRoutes from "./Kambaz/Database/Modules/routes.js";
-import QuizAttemptRoutes from "./Kambaz/Database/Quizzes/routes.js";
+import QuizRoutes from "./Kambaz/Database/Quizzes/routes.js";
+import QuizAttemptRoutes from "./Kambaz/Database/Quizzes/Attempts/routes.js";
 import "dotenv/config";
 import session from "express-session";
 
@@ -23,24 +24,10 @@ app.set("trust proxy", 1);
 app.use(cors({
   credentials: true,
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
-    
-    // Allow localhost for development
-    if (origin.includes("localhost")) {
-      return callback(null, origin);
-    }
-    
-    // Allow all Vercel deployments for chavaz-next-js-4550
-    if (origin.includes("chavaz-next-js-4550") && origin.includes("vercel.app")) {
-      return callback(null, origin);
-    }
-    
-    // Allow CLIENT_URL from environment
-    if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) {
-      return callback(null, origin);
-    }
-    
+    if (origin.includes("localhost")) return callback(null, origin);
+    if (origin.includes("chavaz-next-js-4550") && origin.includes("vercel.app")) return callback(null, origin);
+    if (process.env.CLIENT_URL && origin === process.env.CLIENT_URL) return callback(null, origin);
     callback(new Error("Not allowed by CORS"));
   }
 }));
@@ -65,6 +52,7 @@ CourseRoutes(app, db);
 AssignmentRoutes(app);
 EnrollmentRoutes(app);
 ModulesRoutes(app, db);
+QuizRoutes(app);
 QuizAttemptRoutes(app);
 Lab5(app);
 
